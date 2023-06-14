@@ -1,0 +1,203 @@
+// To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
+
+// You can also use the buttons in the sidebar to perform actions on nodes.
+// Actions currently available include:
+
+// * Enabling / disabling the node
+// * Adding the bus to a bus
+// * Removing the node
+// * Connecting ADC channels
+
+// For more help, browse the DeviceTree documentation at https://docs.zephyrproject.org/latest/guides/dts/index.html
+// You can also visit the nRF DeviceTree extension documentation at https://nrfconnect.github.io/vscode-nrf-connect/devicetree/nrfdevicetree.html
+
+/ {
+	leds {
+		led0: led_0 {
+			gpios = <&gpio0 0 0>;
+			label = "Red LED 1";
+		};
+		led1: led_1 {
+			gpios = <&gpio0 1 0>;
+			label = "Red LED 2";
+		};
+		led2: led_2 {
+			gpios = <&gpio0 2 0>;
+			label = "Red LED 3";
+		};
+		led3: led_3 {
+			gpios = <&gpio0 3 0>;
+			label = "Red LED 4";
+		};
+		led4: led_4 {
+			gpios = <&gpio0 4 0>;
+			label = "Red LED 5";
+		};
+	};
+	
+	buttons {
+		button0: button_0 {
+			gpios = <&gpio0 30 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			label = "Push button 1";
+		};
+		button1: button_1 {
+			gpios = <&gpio0 31 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			label = "Push button 2";
+		};
+	};
+
+	aliases {
+		led0 = &led0;
+		led1 = &led1;
+		led2 = &led2;
+		led3 = &led3;
+		led4 = &led4;
+		sw0 = &button0;
+		sw1 = &button1;
+	};
+
+	chosen {
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+		zephyr,uart-mcumgr = &uart0;
+		zephyr,canbus = &mcp2515;
+		zephyr,mpu6050 = &mpu6050;
+	};
+};
+
+&pinctrl {
+	uart0_default: uart0_default {
+		group1 {
+			psels = <NRF_PSEL(UART_TX, 0, 28)>,
+				<NRF_PSEL(UART_RTS, 0, 27)>;
+		};
+		group2 {
+			psels = <NRF_PSEL(UART_RX, 0, 29)>,
+				<NRF_PSEL(UART_CTS, 0, 26)>;
+			bias-pull-up;
+		};
+	};
+
+	uart0_sleep: uart0_sleep {
+		group1 {
+			psels = <NRF_PSEL(UART_TX, 0, 29)>,
+				<NRF_PSEL(UART_RX, 0, 27)>,
+				<NRF_PSEL(UART_RTS, 0, 29)>,
+				<NRF_PSEL(UART_CTS, 0, 26)>;
+			low-power-enable;
+		};
+	};
+
+	i2c1_default: i2c1_default {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SDA, 0, 24)>,
+				<NRF_PSEL(TWIM_SCL, 0, 23)>;
+		};
+	};
+
+	i2c1_sleep: i2c1_sleep {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SDA, 0, 24)>,
+				<NRF_PSEL(TWIM_SCL, 0, 23)>;
+			low-power-enable;
+		};
+	};
+
+	spi2_default: spi2_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 13)>,
+				<NRF_PSEL(SPIM_MISO, 0, 16)>,
+				<NRF_PSEL(SPIM_MOSI, 0, 15)>;
+		};
+	};
+
+	spi2_sleep: spi2_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 13)>,
+				<NRF_PSEL(SPIM_MISO, 0, 16)>,
+				<NRF_PSEL(SPIM_MOSI, 0, 15)>;
+			low-power-enable;
+		};
+	};
+};
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_default>;
+	pinctrl-1 = <&uart0_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+&i2c1 {
+	status = "okay";
+	pinctrl-0 = <&i2c1_default>;
+	pinctrl-1 = <&i2c1_sleep>;
+	pinctrl-names = "default", "sleep";
+	mpu6050: mpu6050@68 {
+		compatible = "invensense,mpu6050";
+		reg = <0x68>;
+		status = "okay";
+		int-gpios = <&gpio0 22 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&spi2 {
+	status = "okay";
+	cs-gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&spi2_default>;
+	pinctrl-1 = <&spi2_sleep>;
+	pinctrl-names = "default", "sleep";
+
+	mcp2515: can@0 {
+		compatible = "microchip,mcp2515";
+		spi-max-frequency = <1000000>;
+		int-gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+		status = "okay";
+		reg = <0x0>;
+		osc-freq = <8000000>;
+		bus-speed = <500000>;
+		sjw = <1>;
+		sample-point = <875>;
+
+		can-transceiver {
+			max-bitrate = <1000000>;
+		};
+	};
+};
+
+// by default every peripheral is disabled
+// on the DK Arduino peripherals and console are default enabled
+// UART0, UART1, I2C2, PWM0, SPI3, timer0, timer1, timer2, adc
+
+&uart1 {
+	status = "disabled";
+};
+
+&pwm0 {
+	status = "disabled";
+};
+
+&i2c2 {
+	status = "disabled";
+};
+
+&spi3 {
+	status = "disabled";
+};
+
+&timer0 {
+	status = "disabled";
+};
+
+&timer1 {
+	status = "disabled";
+};
+
+&timer2 {
+	status = "disabled";
+};
+
+&adc {
+    status = "disabled";
+};

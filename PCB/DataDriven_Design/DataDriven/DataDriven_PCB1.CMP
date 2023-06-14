@@ -1,0 +1,15 @@
+Component   : G17C0910132EU
+PCB Library : DataDriven_PCB1.PcbLib
+Date        : 2/23/2023
+Time        : 9:16:55 PM
+
+
+
+Dimension : 1.297 x 0.958 in
+
+ Layer(s)              Pads(s)  Tracks(s)  Fill(s)  Arc(s)  Text(s)
+--------------------------------------------------------------------
+ Multi Layer                11          0        0       0        0
+ Top Overlay                 0         10        0       3        0
+--------------------------------------------------------------------
+ Total                      11         10        0       3        0

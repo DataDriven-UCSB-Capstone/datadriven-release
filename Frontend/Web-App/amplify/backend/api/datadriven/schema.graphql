@@ -1,0 +1,9 @@
+type DataDriven @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  Username: String
+  CarModel: String
+  Location: ID
+  Temperature: Int
+  EngRev: Int
+  Speed: Int
+}

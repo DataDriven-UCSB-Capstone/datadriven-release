@@ -1,0 +1,76 @@
+// To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
+
+// You can also use the buttons in the sidebar to perform actions on nodes.
+// Actions currently available include:
+
+// * Enabling / disabling the node
+// * Adding the bus to a bus
+// * Removing the node
+// * Connecting ADC channels
+
+// For more help, browse the DeviceTree documentation at https://docs.zephyrproject.org/latest/guides/dts/index.html
+// You can also visit the nRF DeviceTree extension documentation at https://nrfconnect.github.io/vscode-nrf-connect/devicetree/nrfdevicetree.html
+// ARDUINO SPI USES SPI3
+// SCK P0.13
+// MISO P0.12
+// MOSI P0.11
+// CS P0.10
+// INT P0.16
+&i2c3 {
+	status = "disabled";
+};
+&uart3 {
+	status = "disabled";
+};
+&spi3 {
+	status = "okay";
+};
+&arduino_spi {
+	status = "okay";
+	cs-gpios = <&gpio0 10 GPIO_ACTIVE_LOW>;  /* P0.10 */
+
+	mcp2515: can@0 {
+		compatible = "microchip,mcp2515";
+		spi-max-frequency = <1000000>;
+		int-gpios = <&gpio0 16 GPIO_ACTIVE_LOW>; /* P0.16 */
+		status = "okay";
+		reg = <0x0>;
+		osc-freq = <16000000>;
+		bus-speed = <500000>;
+		sjw = <1>;
+		sample-point = <875>;
+
+		can-transceiver {
+			max-bitrate = <1000000>;
+		};
+	};
+};
+
+// ARDUINO I2C USES I2C2
+// SDA P0.30
+// SCL P0.31
+// INT P0.17
+&uart2 {
+	status = "disabled";
+};
+&spi2 {
+	status = "disabled";
+};
+&i2c2 {
+	status = "okay";
+};
+&arduino_i2c {
+	status = "okay";
+	mpu6050: mpu6050@68 {
+		compatible = "invensense,mpu6050";
+		reg = <0x68>;
+		status = "okay";
+		int-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+	};
+};
+/ {
+	chosen {
+		zephyr,canbus = &mcp2515;
+		zephyr,mpu6050 = &mpu6050;
+	};
+};

@@ -1,0 +1,3 @@
+osource "/home/ubuntu/GitHub/mcp2515_shield/boards/shields/*/Kconfig.defconfig"
+osource "/home/ubuntu/Downloads/capstone/can/boards/shields/*/Kconfig.defconfig"
+osource "/home/ubuntu/ncs/v2.1.2/nrf/boards/shields/*/Kconfig.defconfig"
